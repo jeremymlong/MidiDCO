@@ -1,5 +1,5 @@
 #include <MIDI.h>
-#include <LinkedList.h>
+#include <List.hpp>
 #include "MidiTimer.h"
 #include "MidiDacTimer.h"
 
@@ -10,7 +10,7 @@ constexpr uint8_t gatePin{ 8 };
 midi::SerialMIDI<HardwareSerial> midiSerial(Serial1);
 midi::MidiInterface<midi::SerialMIDI<HardwareSerial>> MIDI((midi::SerialMIDI<HardwareSerial>&)midiSerial);
 
-LinkedList<int> heldNotes;
+List<byte> heldNotes;
 
 void setup()
 {
@@ -41,19 +41,18 @@ void noteOn(midi::Channel channel, byte note, byte velocity)
 void noteOff(midi::Channel channel, byte note, byte velocity)
 {
     // Find the note and remove it
-    for (int i = 0; i < heldNotes.size(); i++)
+    for (int i = 0; i < heldNotes.getSize(); i++)
     {
-        auto n = heldNotes.get(i);
-        if (n == note)
+        if (heldNotes[i] == note)
         {
             heldNotes.remove(i);
             break;
         }
     }
 
-    if (heldNotes.size() > 0)
+    if (heldNotes.getSize() > 0)
     {
-        noteSet(heldNotes.get(heldNotes.size() - 1));
+        noteSet(heldNotes[heldNotes.getSize() - 1]);
     }
     else
     {
